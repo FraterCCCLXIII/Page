@@ -1,0 +1,65 @@
+name: Sync companion forks
+
+# Keeps the forked companion-app repos under this account up to date with their
+# upstreams. Runs daily and can be triggered manually.
+#
+# Requires a repo secret named FORK_SYNC_TOKEN: a fine-grained or classic
+# Personal Access Token with `repo` (contents: read/write) scope on the forks.
+# The default GITHUB_TOKEN cannot push to other repositories, so this PAT is
+# mandatory. Without it the job is skipped with a clear message.
+
+on:
+  schedule:
+    # 06:00 UTC daily.
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Overwrite diverged fork default branches (--force)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-forks
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        fork:
+          - organicmaps
+          - markor
+          - Auxio
+          - Etar-Calendar
+          - MaterialFiles
+          - koreader
+          - readest
+          - quik
+          - KeePassDX
+          - Aegis
+          - thunderbird-android
+    steps:
+      - name: Guard on token
+        env:
+          FORK_SYNC_TOKEN: ${{ secrets.FORK_SYNC_TOKEN }}
+        run: |
+          if [ -z "$FORK_SYNC_TOKEN" ]; then
+            echo "::warning::FORK_SYNC_TOKEN is not set; skipping fork sync."
+            echo "skip=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Sync ${{ matrix.fork }} from upstream
+        if: env.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.FORK_SYNC_TOKEN }}
+          FORCE_FLAG: ${{ inputs.force && '--force' || '' }}
+        run: |
+          dest="${{ github.repository_owner }}/${{ matrix.fork }}"
+          echo "Syncing $dest from its parent default branch..."
+          gh repo sync "$dest" $FORCE_FLAG

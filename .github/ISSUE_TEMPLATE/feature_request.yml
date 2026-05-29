@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest an idea for Page
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the need, not just the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How might Page address this while staying calm and private?
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Alignment with Page's principles
+      options:
+        - label: This does not add analytics, tracking, ads, or cloud AI
+          required: true
+        - label: This does not require Google Play Services
+          required: true
+        - label: This keeps the experience privacy-first and text-first
+          required: true
