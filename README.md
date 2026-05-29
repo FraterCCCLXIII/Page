@@ -93,6 +93,47 @@ The APK lands in `app/build/outputs/apk/debug/`.
 
 ---
 
+## Installing the "bundle" (Page + companion apps)
+
+A key thing to understand: **Android does not let a launcher silently install
+other apps.** There is no APK that contains other installable apps, and a normal
+app can't push packages onto the system. So a "bundle" is achieved one of three
+ways, depending on how turnkey you need it:
+
+### 1. Side-load everything onto your own device (works today)
+
+Use the provisioning script to install Page plus every companion from their
+official open-source sources (F-Droid + GitHub releases) over ADB:
+
+```bash
+# Connect a device/emulator (adb on PATH), then:
+./scripts/install-bundle.sh                 # Page + all companions
+./scripts/install-bundle.sh --no-launcher   # companions only
+./scripts/install-bundle.sh --launcher-only # just build + install Page
+SERIAL=emulator-5554 ./scripts/install-bundle.sh   # target a specific device
+```
+
+This is ideal for setting up your own phone, demos, or CI/emulators. It needs
+`adb`, `curl`, `python3`, and `gh`. No Google Play / Play Services involved.
+
+### 2. In-app first-run setup (the product approach — planned)
+
+The right end-user experience is an onboarding screen that detects which
+companions are missing and deep-links you to install each one (via F-Droid).
+This keeps Page a single, honest install while still guiding you to a complete
+setup. Tracked on the [roadmap](#roadmap) (Phase 2).
+
+### 3. Turnkey / zero-touch (Phase 4)
+
+For a true preinstalled bundle on a fresh device you need elevated provisioning:
+
+- **Device-owner provisioning** (QR / NFC / `dpm`): a managed-setup flow can
+  auto-install a defined app set. This is the "Light Phone-style" turnkey route.
+- **Your own F-Droid repo**: publish Page + a curated app list so users add one
+  repo and install the set from a trusted source.
+- **ROM-level preinstall** (e.g. a LineageOS addon): out of scope for the
+  launcher, but possible later.
+
 ## Set Page as your default launcher
 
 1. Install and open Page once.
