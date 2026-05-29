@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,29 @@ import java.io.IOException
 
 /** Single DataStore for all Page settings. Local-only, no cloud sync. */
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "page_settings")
+
+/**
+ * How Page resolves its dark/light appearance. Persisted as a stable name so
+ * the value survives reordering of the enum.
+ */
+enum class ThemeMode {
+    /** Follow the device's system dark/light setting. */
+    SYSTEM,
+
+    /** Always use the light palette. */
+    LIGHT,
+
+    /** Always use the dark palette (Page's default identity). */
+    DARK;
+
+    companion object {
+        /** Page ships dark-first; if no system signal is available, fall back to this. */
+        val DEFAULT = SYSTEM
+
+        fun fromName(name: String?): ThemeMode =
+            entries.firstOrNull { it.name == name } ?: DEFAULT
+    }
+}
 
 /**
  * Typed, reactive accessor for Page's local preferences.
@@ -39,6 +63,11 @@ class PagePreferences(private val context: Context) {
         .safe()
         .map { it[Keys.FOCUS_MODE] ?: false }
 
+    /** How Page resolves its dark/light appearance. Defaults to following the system. */
+    val themeMode: Flow<ThemeMode> = context.dataStore.data
+        .safe()
+        .map { ThemeMode.fromName(it[Keys.THEME_MODE]) }
+
     /**
      * Whether the user has finished/skipped first-run setup. Combined with
      * live install detection, this prevents re-prompting once they've made
@@ -60,6 +89,10 @@ class PagePreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.HIDDEN_APPS] = packages }
     }
 
+    suspend fun setThemeMode(mode: ThemeMode) {
+        context.dataStore.edit { it[Keys.THEME_MODE] = mode.name }
+    }
+
     suspend fun setSetupDismissed(dismissed: Boolean) {
         context.dataStore.edit { it[Keys.SETUP_DISMISSED] = dismissed }
     }
@@ -74,6 +107,7 @@ class PagePreferences(private val context: Context) {
         val HIDDEN_APPS = stringSetPreferencesKey("hidden_apps")
         val FOCUS_MODE = booleanPreferencesKey("focus_mode")
         val SETUP_DISMISSED = booleanPreferencesKey("setup_dismissed")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
     }
 
     private companion object {

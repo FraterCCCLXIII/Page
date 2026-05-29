@@ -36,6 +36,9 @@
     <string name="settings_system">System settings</string>
     <string name="settings_about">About Page</string>
     <string name="settings_set_default_launcher">Set Page as default launcher</string>
+    <string name="settings_set_default_launcher_subtitle">Make Page your home screen</string>
+    <string name="settings_default_launcher_active">Page is your home app</string>
+    <string name="settings_default_launcher_active_subtitle">Tap to change in system settings</string>
     <string name="settings_recommended_apps">Recommended apps</string>
     <string name="settings_recommended_apps_subtitle">Set up your companion apps</string>
 

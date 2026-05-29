@@ -1,11 +1,17 @@
 package com.pageos.launcher.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+import com.pageos.launcher.data.ThemeMode
 
 private val PageDarkColorScheme = darkColorScheme(
     background = PageColors.DarkBackground,
@@ -32,18 +38,35 @@ private val PageLightColorScheme = lightColorScheme(
 )
 
 /**
- * Page's root theme.
+ * Page's root theme. A single source of truth for color, type, and spacing
+ * tokens so every screen and component themes consistently in both modes.
  *
- * @param darkTheme Page ships monochrome-dark first, so this defaults to dark
- *   regardless of the system setting. Pass the system value to opt into light
- *   mode once it is supported.
+ * @param darkTheme Whether to render the dark palette. Defaults to the system
+ *   setting; pass an explicit value to honor a user override.
  */
 @Composable
 fun PageTheme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
     val colorScheme = if (darkTheme) PageDarkColorScheme else PageLightColorScheme
+
+    // Keep the system bars in step with the active palette so the status/nav
+    // bar icons stay legible against Page's background in either mode.
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            @Suppress("DEPRECATION")
+            window.statusBarColor = colorScheme.background.toArgb()
+            @Suppress("DEPRECATION")
+            window.navigationBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !darkTheme
+                isAppearanceLightNavigationBars = !darkTheme
+            }
+        }
+    }
 
     CompositionLocalProvider(LocalPageSpacing provides PageSpacing()) {
         MaterialTheme(
@@ -60,6 +83,10 @@ object PageTheme {
         @Composable get() = LocalPageSpacing.current
 }
 
-/** Reserved for future use: respect the system dark/light setting. */
+/** Resolves a persisted [ThemeMode] to a concrete dark/light value. */
 @Composable
-fun systemDarkTheme(): Boolean = isSystemInDarkTheme()
+fun ThemeMode.resolveIsDark(): Boolean = when (this) {
+    ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    ThemeMode.LIGHT -> false
+    ThemeMode.DARK -> true
+}

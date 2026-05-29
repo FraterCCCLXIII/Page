@@ -1,5 +1,7 @@
 package com.pageos.launcher.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,14 +18,20 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pageos.launcher.BuildConfig
 import com.pageos.launcher.R
 import com.pageos.launcher.assistant.SystemSetting
+import com.pageos.launcher.launcher.DefaultLauncher
 import com.pageos.launcher.notifications.PageNotificationListener
 import com.pageos.launcher.ui.PageViewModel
 import com.pageos.launcher.ui.components.PageScreenHeader
@@ -91,9 +99,27 @@ fun SettingsScreen(
         )
 
         SectionTitle(stringResource(R.string.settings_system))
+        var isDefaultLauncher by remember { mutableStateOf(viewModel.isDefaultLauncher()) }
+        val roleLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) {
+            isDefaultLauncher = viewModel.isDefaultLauncher()
+        }
+        LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+            isDefaultLauncher = viewModel.isDefaultLauncher()
+        }
         SettingsRow(
-            title = stringResource(R.string.settings_set_default_launcher),
-            onClick = { viewModel.openDefaultLauncherSettings() },
+            title = if (isDefaultLauncher) {
+                stringResource(R.string.settings_default_launcher_active)
+            } else {
+                stringResource(R.string.settings_set_default_launcher)
+            },
+            subtitle = if (isDefaultLauncher) {
+                stringResource(R.string.settings_default_launcher_active_subtitle)
+            } else {
+                stringResource(R.string.settings_set_default_launcher_subtitle)
+            },
+            onClick = { roleLauncher.launch(DefaultLauncher.requestIntent(context)) },
         )
         SystemSetting.entries.forEach { setting ->
             SettingsRow(

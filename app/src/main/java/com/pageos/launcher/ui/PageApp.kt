@@ -26,6 +26,7 @@ import com.pageos.launcher.ui.screens.SearchScreen
 import com.pageos.launcher.ui.screens.SettingsScreen
 import com.pageos.launcher.ui.screens.SetupScreen
 import com.pageos.launcher.ui.theme.PageTheme
+import com.pageos.launcher.ui.theme.resolveIsDark
 import kotlinx.coroutines.launch
 
 /** Navigation routes for the launcher. */
@@ -47,7 +48,8 @@ object PageRoutes {
  */
 @Composable
 fun PageApp(viewModel: PageViewModel = viewModel()) {
-    PageTheme(darkTheme = true) {
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
+    PageTheme(darkTheme = themeMode.resolveIsDark()) {
         val navController = rememberNavController()
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()

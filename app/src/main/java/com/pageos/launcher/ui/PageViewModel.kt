@@ -11,8 +11,10 @@ import com.pageos.launcher.assistant.SystemSetting
 import com.pageos.launcher.data.AppInfo
 import com.pageos.launcher.data.AppRepository
 import com.pageos.launcher.data.PagePreferences
+import com.pageos.launcher.data.ThemeMode
 import com.pageos.launcher.launcher.CompanionApp
 import com.pageos.launcher.launcher.CompanionCatalog
+import com.pageos.launcher.launcher.DefaultLauncher
 import com.pageos.launcher.launcher.HomeAction
 import com.pageos.launcher.launcher.LaunchOutcome
 import com.pageos.launcher.launcher.LauncherIntentHandler
@@ -53,6 +55,10 @@ class PageViewModel(application: Application) : AndroidViewModel(application) {
 
     val showAppIcons: StateFlow<Boolean> = preferences.showAppIcons
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    /** The user's chosen dark/light appearance mode. */
+    val themeMode: StateFlow<ThemeMode> = preferences.themeMode
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.DEFAULT)
 
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
@@ -131,6 +137,9 @@ class PageViewModel(application: Application) : AndroidViewModel(application) {
     fun openDefaultLauncherSettings(): Boolean =
         repository.startSafely(SystemSettingsLauncher.defaultLauncherIntent())
 
+    /** Whether Page is currently the device's default Home app. */
+    fun isDefaultLauncher(): Boolean = DefaultLauncher.isDefault(getApplication())
+
     /** Opens the system "Notification access" screen for the digest stub. */
     fun openNotificationAccessSettings(): Boolean =
         repository.startSafely(PageNotificationListener.settingsIntent())
@@ -140,6 +149,10 @@ class PageViewModel(application: Application) : AndroidViewModel(application) {
             preferences.setShowAppIcons(enabled)
             refreshApps()
         }
+    }
+
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch { preferences.setThemeMode(mode) }
     }
 
     /**
