@@ -22,11 +22,10 @@ object DefaultApps {
     const val MATERIAL_FILES = "me.zhanghai.android.files"
     const val KOREADER = "org.koreader.launcher"
 
-    // --- Needs verification -------------------------------------------------
-    // TODO(verify): Readest Android package id not confirmed yet.
-    const val READEST = "com.readest.app" // PLACEHOLDER
-    // TODO(verify): QUIK SMS package id not confirmed yet.
-    const val QUIK_SMS = "org.quik.sms" // PLACEHOLDER
+    // Readest Android build (Tauri) identifier, from src-tauri/tauri.conf.json.
+    const val READEST = "com.bilingify.readest"
+    // QUIK SMS applicationId, from the quik-sms/quik Gradle config.
+    const val QUIK_SMS = "dev.octoshrimpy.quik"
 
     /**
      * Ordered preference lists per action. The handler launches the first

@@ -111,9 +111,9 @@ you want (F-Droid is a great source):
 
 | Action     | App                       | Package (verify before relying on it)     |
 | ---------- | ------------------------- | ----------------------------------------- |
-| Messages   | QUIK SMS                  | `org.quik.sms` *(TODO: verify)*           |
+| Messages   | QUIK SMS                  | `dev.octoshrimpy.quik`                     |
 | Maps       | Organic Maps              | `app.organicmaps`                         |
-| Books      | KOReader / Readest        | `org.koreader.launcher` / *(TODO: verify)*|
+| Books      | KOReader / Readest        | `org.koreader.launcher` / `com.bilingify.readest` |
 | Notes      | Markor                    | `net.gsantner.markor`                     |
 | Music      | Auxio                     | `org.oxycblt.auxio`                       |
 | Camera     | Open Camera               | `net.sourceforge.opencamera`              |
@@ -123,8 +123,12 @@ you want (F-Droid is a great source):
 | 2FA        | Aegis Authenticator       | —                                         |
 | Email      | Thunderbird for Android   | —                                         |
 
-Package names marked *TODO: verify* are placeholders in `DefaultApps.kt`; confirm
-them against F-Droid / the Play Store before depending on them.
+> Open Camera is published on SourceForge, not GitHub, so it is not in the
+> companion forks list. Page still opens it via `net.sourceforge.opencamera`
+> (or any camera app as a fallback).
+
+Forked upstreams of these companion apps live under the same account for easy
+contribution and pinning.
 
 ---
 
