@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+      Window-level theme only. The actual UI is themed in Compose
+      (see ui/theme/Theme.kt). This exists so the launcher window paints a
+      calm black background immediately, avoiding any white flash on start.
+      Page ships monochrome-dark first; light mode arrives in a later phase.
+    -->
+    <style name="Theme.Page" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/page_black</item>
+        <item name="android:statusBarColor">@color/page_black</item>
+        <item name="android:navigationBarColor">@color/page_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:colorBackground">@color/page_black</item>
+    </style>
+</resources>

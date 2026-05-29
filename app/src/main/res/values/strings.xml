@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Page</string>
+    <string name="notification_listener_label">Page Notification Digest</string>
+
+    <!-- Home -->
+    <string name="home_prompt">What do you need?</string>
+    <string name="command_hint">Type to search apps or actions</string>
+
+    <!-- Primary actions -->
+    <string name="action_phone">Phone</string>
+    <string name="action_messages">Messages</string>
+    <string name="action_maps">Maps</string>
+    <string name="action_books">Books</string>
+    <string name="action_notes">Notes</string>
+    <string name="action_music">Music</string>
+    <string name="action_camera">Camera</string>
+    <string name="action_calendar">Calendar</string>
+    <string name="action_files">Files</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Generic -->
+    <string name="all_apps">All apps</string>
+    <string name="search">Search</string>
+    <string name="back">Back</string>
+    <string name="no_app_installed">No app installed for this action.</string>
+    <string name="no_results">No matching apps or actions.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_default_apps">Default apps</string>
+    <string name="settings_hidden_apps">Hidden apps</string>
+    <string name="settings_notification_digest">Notification digest</string>
+    <string name="settings_focus_mode">Focus mode</string>
+    <string name="settings_show_icons">Show app icons</string>
+    <string name="settings_system">System settings</string>
+    <string name="settings_about">About Page</string>
+    <string name="settings_set_default_launcher">Set Page as default launcher</string>
+
+    <string name="coming_soon">Coming soon</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Minimal "P" wordmark for Page. Drawn on the 108x108dp adaptive-icon canvas;
+  the safe zone is the centered 66dp circle, so the glyph stays well inside it.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Stem of the P -->
+    <path
+        android:fillColor="#FFF2F2F2"
+        android:pathData="M42,34 h6 v40 h-6 z" />
+    <!-- Bowl of the P -->
+    <path
+        android:fillColor="#FFF2F2F2"
+        android:pathData="M48,34 h10 a12,12 0 0 1 0,24 h-10 v-6 h10 a6,6 0 0 0 0,-12 h-10 z" />
+</vector>
