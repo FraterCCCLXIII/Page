@@ -39,6 +39,15 @@ class PagePreferences(private val context: Context) {
         .safe()
         .map { it[Keys.FOCUS_MODE] ?: false }
 
+    /**
+     * Whether the user has finished/skipped first-run setup. Combined with
+     * live install detection, this prevents re-prompting once they've made
+     * their companion-app choices.
+     */
+    val setupDismissed: Flow<Boolean> = context.dataStore.data
+        .safe()
+        .map { it[Keys.SETUP_DISMISSED] ?: false }
+
     suspend fun setShowAppIcons(enabled: Boolean) {
         context.dataStore.edit { it[Keys.SHOW_APP_ICONS] = enabled }
     }
@@ -51,6 +60,10 @@ class PagePreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.HIDDEN_APPS] = packages }
     }
 
+    suspend fun setSetupDismissed(dismissed: Boolean) {
+        context.dataStore.edit { it[Keys.SETUP_DISMISSED] = dismissed }
+    }
+
     /** Swallow read errors (e.g. corrupt file) by emitting empty preferences. */
     private fun Flow<Preferences>.safe(): Flow<Preferences> = catch { throwable ->
         if (throwable is IOException) emit(emptyPreferences()) else throw throwable
@@ -60,6 +73,7 @@ class PagePreferences(private val context: Context) {
         val SHOW_APP_ICONS = booleanPreferencesKey("show_app_icons")
         val HIDDEN_APPS = stringSetPreferencesKey("hidden_apps")
         val FOCUS_MODE = booleanPreferencesKey("focus_mode")
+        val SETUP_DISMISSED = booleanPreferencesKey("setup_dismissed")
     }
 
     private companion object {

@@ -36,6 +36,19 @@
     <string name="settings_system">System settings</string>
     <string name="settings_about">About Page</string>
     <string name="settings_set_default_launcher">Set Page as default launcher</string>
+    <string name="settings_recommended_apps">Recommended apps</string>
+    <string name="settings_recommended_apps_subtitle">Set up your companion apps</string>
 
     <string name="coming_soon">Coming soon</string>
+
+    <!-- First-run setup -->
+    <string name="setup_title">Set up Page</string>
+    <string name="setup_subtitle">Page works best with a few calm, open-source apps. Install the ones you want — nothing is required, and nothing is tracked.</string>
+    <string name="setup_progress">%1$d of %2$d essentials installed</string>
+    <string name="setup_essential">Essentials</string>
+    <string name="setup_recommended">Recommended</string>
+    <string name="setup_install">Install</string>
+    <string name="setup_installed">Installed</string>
+    <string name="setup_continue">Continue to Page</string>
+    <string name="setup_skip">Skip for now</string>
 </resources>

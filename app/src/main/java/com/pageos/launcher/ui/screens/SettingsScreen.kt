@@ -33,6 +33,7 @@ import com.pageos.launcher.ui.theme.PageTheme
 fun SettingsScreen(
     viewModel: PageViewModel,
     onBack: () -> Unit,
+    onOpenSetup: () -> Unit,
     onMessage: (String) -> Unit,
 ) {
     val spacing = PageTheme.spacing
@@ -59,6 +60,11 @@ fun SettingsScreen(
         )
 
         SectionTitle(stringResource(R.string.settings_default_apps))
+        SettingsRow(
+            title = stringResource(R.string.settings_recommended_apps),
+            subtitle = stringResource(R.string.settings_recommended_apps_subtitle),
+            onClick = onOpenSetup,
+        )
         SettingsRow(
             title = stringResource(R.string.settings_default_apps),
             subtitle = comingSoon,

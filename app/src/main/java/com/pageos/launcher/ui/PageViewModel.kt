@@ -1,6 +1,8 @@
 package com.pageos.launcher.ui
 
 import android.app.Application
+import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pageos.launcher.assistant.IntentParser
@@ -9,17 +11,22 @@ import com.pageos.launcher.assistant.SystemSetting
 import com.pageos.launcher.data.AppInfo
 import com.pageos.launcher.data.AppRepository
 import com.pageos.launcher.data.PagePreferences
+import com.pageos.launcher.launcher.CompanionApp
+import com.pageos.launcher.launcher.CompanionCatalog
 import com.pageos.launcher.launcher.HomeAction
 import com.pageos.launcher.launcher.LaunchOutcome
 import com.pageos.launcher.launcher.LauncherIntentHandler
 import com.pageos.launcher.launcher.SystemSettingsLauncher
 import com.pageos.launcher.notifications.PageNotificationListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** What a parsed command resolved to, for the screen to act on. */
 sealed interface CommandResult {
@@ -50,8 +57,51 @@ class PageViewModel(application: Application) : AndroidViewModel(application) {
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
 
+    /** Package names of companion apps currently installed. */
+    private val _installedCompanions = MutableStateFlow<Set<String>>(emptySet())
+    val installedCompanions: StateFlow<Set<String>> = _installedCompanions.asStateFlow()
+
+    /**
+     * The launcher's start destination, resolved once at launch:
+     * the setup screen when essential companions are missing and setup hasn't
+     * been dismissed, otherwise the home screen. Null until resolved.
+     */
+    private val _startRoute = MutableStateFlow<String?>(null)
+    val startRoute: StateFlow<String?> = _startRoute.asStateFlow()
+
     init {
         refreshApps()
+        resolveStartRoute()
+    }
+
+    /** Re-checks which companion apps are installed (e.g. after returning from an install). */
+    fun refreshCompanionStatus() {
+        viewModelScope.launch { _installedCompanions.value = computeInstalledCompanions() }
+    }
+
+    private fun resolveStartRoute() {
+        viewModelScope.launch {
+            val installed = computeInstalledCompanions()
+            _installedCompanions.value = installed
+            val dismissed = preferences.setupDismissed.first()
+            val missingEssentials = CompanionCatalog.essential.any { it.packageName !in installed }
+            _startRoute.value =
+                if (!dismissed && missingEssentials) PageRoutes.SETUP else PageRoutes.HOME
+        }
+    }
+
+    private suspend fun computeInstalledCompanions(): Set<String> =
+        withContext(Dispatchers.IO) {
+            CompanionCatalog.allPackages.filter { repository.isAppInstalled(it) }.toSet()
+        }
+
+    /** Opens the install page (F-Droid package page or GitHub releases) for a companion. */
+    fun installCompanion(app: CompanionApp): Boolean =
+        repository.startSafely(Intent(Intent.ACTION_VIEW, Uri.parse(app.installUrl)))
+
+    /** Marks first-run setup as finished/skipped so it won't auto-appear again. */
+    fun dismissSetup() {
+        viewModelScope.launch { preferences.setSetupDismissed(true) }
     }
 
     fun refreshApps() {
