@@ -1,16 +1,16 @@
 package com.pageos.launcher.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pageos.launcher.R
 import com.pageos.launcher.launcher.HomeAction
 import com.pageos.launcher.launcher.LaunchOutcome
@@ -53,74 +53,72 @@ fun HomeScreen(
 ) {
     val spacing = PageTheme.spacing
     var query by remember { mutableStateOf("") }
+    val showCommandBar by viewModel.showCommandBar.collectAsStateWithLifecycle()
     val noAppMessage = stringResource(R.string.no_app_installed)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(horizontal = spacing.screenPadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(Modifier.height(spacing.xl))
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Spacer(Modifier.height(spacing.xxl))
-        Text(
-            text = stringResource(R.string.home_prompt),
-            style = MaterialTheme.typography.displayLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(Modifier.height(spacing.lg))
-        PageCommandBar(
-            value = query,
-            onValueChange = { query = it },
-            onSubmit = {
-                handleCommand(
-                    raw = query,
-                    viewModel = viewModel,
-                    onOpenSettings = onOpenSettings,
-                    onOpenSearch = onOpenSearch,
-                    onNoApp = { onMessage(noAppMessage) },
-                )
-                query = ""
-            },
-            hint = stringResource(R.string.command_hint),
-        )
-
-        Spacer(Modifier.height(spacing.xl))
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(spacing.xs),
+        // Primary actions: vertically centered when they fit, scrollable if not.
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
         ) {
-            primaryActions.forEach { (action, labelRes) ->
-                PageTextButton(
-                    label = stringResource(labelRes),
-                    onClick = {
-                        when (action) {
-                            HomeAction.SETTINGS -> onOpenSettings()
-                            else -> {
-                                val outcome = viewModel.performHomeAction(action)
-                                if (outcome == LaunchOutcome.NoAppAvailable) onMessage(noAppMessage)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(spacing.xs),
+            ) {
+                Spacer(Modifier.height(spacing.lg))
+                primaryActions.forEach { (action, labelRes) ->
+                    PageTextButton(
+                        label = stringResource(labelRes),
+                        onClick = {
+                            when (action) {
+                                HomeAction.SETTINGS -> onOpenSettings()
+                                else -> {
+                                    val outcome = viewModel.performHomeAction(action)
+                                    if (outcome == LaunchOutcome.NoAppAvailable) onMessage(noAppMessage)
+                                }
                             }
-                        }
-                    },
+                        },
+                    )
+                }
+                Spacer(Modifier.height(spacing.sm))
+                PageTextButton(
+                    label = stringResource(R.string.all_apps),
+                    onClick = onOpenApps,
                 )
+                Spacer(Modifier.height(spacing.lg))
             }
         }
 
-        Spacer(Modifier.height(spacing.lg))
-        PageTextButton(
-            label = stringResource(R.string.all_apps),
-            onClick = onOpenApps,
-        )
-        Spacer(Modifier.height(spacing.xxl))
+        // The command bar sticks to the bottom and only appears when enabled.
+        if (showCommandBar) {
+            PageCommandBar(
+                value = query,
+                onValueChange = { query = it },
+                onSubmit = {
+                    handleCommand(
+                        raw = query,
+                        viewModel = viewModel,
+                        onOpenSettings = onOpenSettings,
+                        onOpenSearch = onOpenSearch,
+                        onNoApp = { onMessage(noAppMessage) },
+                    )
+                    query = ""
+                },
+                hint = stringResource(R.string.command_hint),
+                modifier = Modifier
+                    .imePadding()
+                    .padding(top = spacing.sm, bottom = spacing.lg),
+            )
+        }
     }
 }
 

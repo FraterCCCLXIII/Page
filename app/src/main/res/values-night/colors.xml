@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark window/splash background, used when the system is in dark mode. -->
+    <color name="page_window_background">#FF000000</color>
+</resources>

@@ -7,7 +7,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -33,9 +32,9 @@ fun PageCommandBar(
         singleLine = true,
         textStyle = MaterialTheme.typography.bodyLarge,
         placeholder = {
-            Text(
+            PageText(
                 text = hint,
-                style = MaterialTheme.typography.bodyLarge,
+                role = PageTextRole.Body,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },

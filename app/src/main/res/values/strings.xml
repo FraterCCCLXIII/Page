@@ -33,6 +33,12 @@
     <string name="settings_notification_digest">Notification digest</string>
     <string name="settings_focus_mode">Focus mode</string>
     <string name="settings_show_icons">Show app icons</string>
+    <string name="settings_show_command_bar">Show search bar</string>
+    <string name="settings_tile_view">Tile app view</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
     <string name="settings_system">System settings</string>
     <string name="settings_about">About Page</string>
     <string name="settings_set_default_launcher">Set Page as default launcher</string>

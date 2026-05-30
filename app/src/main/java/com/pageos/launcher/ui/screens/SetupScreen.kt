@@ -10,16 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +27,10 @@ import com.pageos.launcher.R
 import com.pageos.launcher.launcher.CompanionApp
 import com.pageos.launcher.launcher.CompanionCatalog
 import com.pageos.launcher.ui.PageViewModel
+import com.pageos.launcher.ui.components.PageButton
+import com.pageos.launcher.ui.components.PageButtonVariant
+import com.pageos.launcher.ui.components.PageText
+import com.pageos.launcher.ui.components.PageTextRole
 import com.pageos.launcher.ui.theme.PageTheme
 
 /**
@@ -64,26 +62,23 @@ fun SetupScreen(
     ) {
         item {
             Spacer(Modifier.height(spacing.xl))
-            Text(
+            PageText(
                 text = stringResource(R.string.setup_title),
-                style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.onBackground,
+                role = PageTextRole.Display,
             )
             Spacer(Modifier.height(spacing.sm))
-            Text(
+            PageText(
                 text = stringResource(R.string.setup_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                role = PageTextRole.BodySecondary,
             )
             Spacer(Modifier.height(spacing.md))
-            Text(
+            PageText(
                 text = stringResource(
                     R.string.setup_progress,
                     essentialInstalled,
                     CompanionCatalog.essential.size,
                 ),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                role = PageTextRole.Label,
             )
             Spacer(Modifier.height(spacing.lg))
             SectionLabel(stringResource(R.string.setup_essential))
@@ -112,23 +107,14 @@ fun SetupScreen(
 
         item {
             Spacer(Modifier.height(spacing.xl))
-            Button(
+            PageButton(
+                label = stringResource(
+                    if (allEssentialsReady) R.string.setup_continue else R.string.setup_skip,
+                ),
                 onClick = onFinish,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(spacing.cornerRadius),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onBackground,
-                    contentColor = MaterialTheme.colorScheme.background,
-                ),
-            ) {
-                Text(
-                    text = stringResource(
-                        if (allEssentialsReady) R.string.setup_continue else R.string.setup_skip,
-                    ),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(vertical = spacing.sm),
-                )
-            }
+                variant = PageButtonVariant.Primary,
+            )
             Spacer(Modifier.height(spacing.xxl))
         }
     }
@@ -136,10 +122,9 @@ fun SetupScreen(
 
 @Composable
 private fun SectionLabel(text: String) {
-    Text(
+    PageText(
         text = text.uppercase(),
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        role = PageTextRole.Label,
         modifier = Modifier.padding(bottom = PageTheme.spacing.xs),
     )
 }
@@ -159,15 +144,13 @@ private fun CompanionRow(
         horizontalArrangement = Arrangement.spacedBy(spacing.md),
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(
+            PageText(
                 text = app.name,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground,
+                role = PageTextRole.Body,
             )
-            Text(
+            PageText(
                 text = "${app.purpose} · ${app.source.displayName}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                role = PageTextRole.BodySecondary,
             )
         }
         if (installed) {
@@ -177,24 +160,20 @@ private fun CompanionRow(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground,
                 )
-                Text(
+                PageText(
                     text = stringResource(R.string.setup_installed),
-                    style = MaterialTheme.typography.labelLarge,
+                    role = PageTextRole.Label,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.End,
                     modifier = Modifier.padding(start = spacing.xs),
                 )
             }
         } else {
-            OutlinedButton(
+            PageButton(
+                label = stringResource(R.string.setup_install),
                 onClick = onInstall,
-                shape = RoundedCornerShape(spacing.cornerRadius),
-            ) {
-                Text(
-                    text = stringResource(R.string.setup_install),
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-            }
+                variant = PageButtonVariant.Secondary,
+            )
         }
     }
 }

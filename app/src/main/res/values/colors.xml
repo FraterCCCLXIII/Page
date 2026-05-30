@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Monochrome palette. Compose drives the in-app theme; these mirror it
-         for the splash/window background so there is no white flash. -->
+         for the splash/window background so there is no flash on start. -->
     <color name="page_black">#FF000000</color>
     <color name="page_near_black">#FF0A0A0A</color>
     <color name="page_white">#FFF2F2F2</color>
     <color name="page_dim">#FF8A8A8A</color>
+
+    <!-- Window/splash background. Light by default (day); the values-night
+         variant overrides it to black so the launch surface matches the
+         system dark/light setting. -->
+    <color name="page_window_background">#FFFFFFFF</color>
 </resources>

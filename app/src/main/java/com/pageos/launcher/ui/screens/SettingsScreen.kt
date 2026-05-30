@@ -3,6 +3,7 @@ package com.pageos.launcher.ui.screens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,10 +31,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pageos.launcher.BuildConfig
 import com.pageos.launcher.R
 import com.pageos.launcher.assistant.SystemSetting
+import com.pageos.launcher.data.AppLayout
+import com.pageos.launcher.data.ThemeMode
 import com.pageos.launcher.launcher.DefaultLauncher
 import com.pageos.launcher.notifications.PageNotificationListener
 import com.pageos.launcher.ui.PageViewModel
+import com.pageos.launcher.ui.components.PageButton
+import com.pageos.launcher.ui.components.PageButtonVariant
 import com.pageos.launcher.ui.components.PageScreenHeader
+import com.pageos.launcher.ui.components.PageText
+import com.pageos.launcher.ui.components.PageTextRole
 import com.pageos.launcher.ui.theme.PageTheme
 
 @Composable
@@ -47,6 +53,9 @@ fun SettingsScreen(
     val spacing = PageTheme.spacing
     val context = LocalContext.current
     val showIcons by viewModel.showAppIcons.collectAsStateWithLifecycle()
+    val showCommandBar by viewModel.showCommandBar.collectAsStateWithLifecycle()
+    val appLayout by viewModel.appLayout.collectAsStateWithLifecycle()
+    val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val notificationsEnabled = PageNotificationListener.isEnabled(context)
     val comingSoon = stringResource(R.string.coming_soon)
 
@@ -65,6 +74,24 @@ fun SettingsScreen(
             title = stringResource(R.string.settings_show_icons),
             checked = showIcons,
             onCheckedChange = viewModel::setShowAppIcons,
+        )
+        SettingsToggleRow(
+            title = stringResource(R.string.settings_show_command_bar),
+            checked = showCommandBar,
+            onCheckedChange = viewModel::setShowCommandBar,
+        )
+        SettingsToggleRow(
+            title = stringResource(R.string.settings_tile_view),
+            checked = appLayout == AppLayout.TILES,
+            onCheckedChange = { useTiles ->
+                viewModel.setAppLayout(if (useTiles) AppLayout.TILES else AppLayout.LIST)
+            },
+        )
+
+        SectionTitle(stringResource(R.string.settings_appearance))
+        ThemeModeSelector(
+            selected = themeMode,
+            onSelect = viewModel::setThemeMode,
         )
 
         SectionTitle(stringResource(R.string.settings_default_apps))
@@ -151,10 +178,9 @@ private fun SystemSetting.displayName(): String = when (this) {
 @Composable
 private fun SectionTitle(text: String) {
     Spacer(Modifier.height(PageTheme.spacing.lg))
-    Text(
+    PageText(
         text = text.uppercase(),
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        role = PageTextRole.Label,
         modifier = Modifier.padding(bottom = PageTheme.spacing.xs),
     )
 }
@@ -172,20 +198,56 @@ private fun SettingsRow(
             .clickable(onClick = onClick)
             .padding(vertical = spacing.rowVertical),
     ) {
-        Text(
+        PageText(
             text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
+            role = PageTextRole.Body,
         )
         if (subtitle != null) {
-            Text(
+            PageText(
                 text = subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                role = PageTextRole.BodySecondary,
             )
         }
     }
 }
+
+/**
+ * A calm segmented selector for the dark/light appearance. The active mode is a
+ * filled [PageButton]; the others are outlined, so it reads as one consistent
+ * control in either theme.
+ */
+@Composable
+private fun ThemeModeSelector(
+    selected: ThemeMode,
+    onSelect: (ThemeMode) -> Unit,
+) {
+    val spacing = PageTheme.spacing
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = spacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(spacing.sm),
+    ) {
+        themeModeOptions.forEach { (mode, labelRes) ->
+            PageButton(
+                label = stringResource(labelRes),
+                onClick = { onSelect(mode) },
+                modifier = Modifier.weight(1f),
+                variant = if (mode == selected) {
+                    PageButtonVariant.Primary
+                } else {
+                    PageButtonVariant.Secondary
+                },
+            )
+        }
+    }
+}
+
+private val themeModeOptions: List<Pair<ThemeMode, Int>> = listOf(
+    ThemeMode.SYSTEM to R.string.theme_system,
+    ThemeMode.LIGHT to R.string.theme_light,
+    ThemeMode.DARK to R.string.theme_dark,
+)
 
 @Composable
 private fun SettingsToggleRow(
@@ -200,10 +262,9 @@ private fun SettingsToggleRow(
             .padding(vertical = spacing.rowVertical),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
+        PageText(
             text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
+            role = PageTextRole.Body,
             modifier = Modifier.weight(1f),
         )
         Switch(

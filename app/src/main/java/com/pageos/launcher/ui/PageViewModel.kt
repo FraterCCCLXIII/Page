@@ -10,6 +10,7 @@ import com.pageos.launcher.assistant.PageAction
 import com.pageos.launcher.assistant.SystemSetting
 import com.pageos.launcher.data.AppInfo
 import com.pageos.launcher.data.AppRepository
+import com.pageos.launcher.data.AppLayout
 import com.pageos.launcher.data.PagePreferences
 import com.pageos.launcher.data.ThemeMode
 import com.pageos.launcher.launcher.CompanionApp
@@ -59,6 +60,14 @@ class PageViewModel(application: Application) : AndroidViewModel(application) {
     /** The user's chosen dark/light appearance mode. */
     val themeMode: StateFlow<ThemeMode> = preferences.themeMode
         .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.DEFAULT)
+
+    /** Whether the home screen shows the search/command bar. */
+    val showCommandBar: StateFlow<Boolean> = preferences.showCommandBar
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    /** How the app list and search results are laid out (list vs. tiles). */
+    val appLayout: StateFlow<AppLayout> = preferences.appLayout
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AppLayout.DEFAULT)
 
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
@@ -153,6 +162,14 @@ class PageViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setThemeMode(mode: ThemeMode) {
         viewModelScope.launch { preferences.setThemeMode(mode) }
+    }
+
+    fun setShowCommandBar(enabled: Boolean) {
+        viewModelScope.launch { preferences.setShowCommandBar(enabled) }
+    }
+
+    fun setAppLayout(layout: AppLayout) {
+        viewModelScope.launch { preferences.setAppLayout(layout) }
     }
 
     /**

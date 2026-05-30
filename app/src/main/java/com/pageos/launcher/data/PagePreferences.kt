@@ -40,6 +40,22 @@ enum class ThemeMode {
     }
 }
 
+/** How the app list (and search results) are laid out. */
+enum class AppLayout {
+    /** Single-column text rows (Page's calm, text-first default). */
+    LIST,
+
+    /** A minimalist grid of tiles. */
+    TILES;
+
+    companion object {
+        val DEFAULT = LIST
+
+        fun fromName(name: String?): AppLayout =
+            entries.firstOrNull { it.name == name } ?: DEFAULT
+    }
+}
+
 /**
  * Typed, reactive accessor for Page's local preferences.
  *
@@ -69,6 +85,19 @@ class PagePreferences(private val context: Context) {
         .map { ThemeMode.fromName(it[Keys.THEME_MODE]) }
 
     /**
+     * Whether the home screen shows the search/command bar. Off by default to
+     * keep the home screen quiet; the user opts in here.
+     */
+    val showCommandBar: Flow<Boolean> = context.dataStore.data
+        .safe()
+        .map { it[Keys.SHOW_COMMAND_BAR] ?: DEFAULT_SHOW_COMMAND_BAR }
+
+    /** How the app list and search results are laid out (list vs. tiles). */
+    val appLayout: Flow<AppLayout> = context.dataStore.data
+        .safe()
+        .map { AppLayout.fromName(it[Keys.APP_LAYOUT]) }
+
+    /**
      * Whether the user has finished/skipped first-run setup. Combined with
      * live install detection, this prevents re-prompting once they've made
      * their companion-app choices.
@@ -93,6 +122,14 @@ class PagePreferences(private val context: Context) {
         context.dataStore.edit { it[Keys.THEME_MODE] = mode.name }
     }
 
+    suspend fun setShowCommandBar(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.SHOW_COMMAND_BAR] = enabled }
+    }
+
+    suspend fun setAppLayout(layout: AppLayout) {
+        context.dataStore.edit { it[Keys.APP_LAYOUT] = layout.name }
+    }
+
     suspend fun setSetupDismissed(dismissed: Boolean) {
         context.dataStore.edit { it[Keys.SETUP_DISMISSED] = dismissed }
     }
@@ -108,9 +145,12 @@ class PagePreferences(private val context: Context) {
         val FOCUS_MODE = booleanPreferencesKey("focus_mode")
         val SETUP_DISMISSED = booleanPreferencesKey("setup_dismissed")
         val THEME_MODE = stringPreferencesKey("theme_mode")
+        val SHOW_COMMAND_BAR = booleanPreferencesKey("show_command_bar")
+        val APP_LAYOUT = stringPreferencesKey("app_layout")
     }
 
     private companion object {
         const val DEFAULT_SHOW_ICONS = false
+        const val DEFAULT_SHOW_COMMAND_BAR = false
     }
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+      Dark (night) window theme. The background color is supplied by
+      values-night/colors.xml; here we only flip the system-bar icon contrast
+      to light icons for the dark surface.
+    -->
+    <style name="Theme.Page" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/page_window_background</item>
+        <item name="android:statusBarColor">@color/page_window_background</item>
+        <item name="android:navigationBarColor">@color/page_window_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:colorBackground">@color/page_window_background</item>
+    </style>
+</resources>
